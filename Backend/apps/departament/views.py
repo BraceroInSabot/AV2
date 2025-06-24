@@ -158,11 +158,47 @@ class EmployeeListView(APIView):
                 {
                     "id": employee.employee_ID,
                     "name": employee.employee_name,
-                    "email": employee.employee_email,
-                    "phone": employee.employee_phone,
                     "function_title": employee.employee_function.function_title if employee.employee_function else "Não definido", 
-                    "department": employee.employee_department.department_name if employee.employee_department else None
                 } for employee in employees
             ]
         }
         return Response({"success": True, "data": data}, status=200)
+    
+class EmployeeDetailView(APIView):
+    def get(self, request, pk, fpk):
+        try:
+            employee = Employee.objects.get(
+                employee_ID=fpk,
+                employee_department__department_ID=pk
+            )
+        except Employee.DoesNotExist:
+            return Response({"success": False, "message": "Funcionário não encontrado."}, status=404)
+        except Exception as e:
+            return Response({"success": False, "message": f"Erro ao buscar funcionário: {str(e)}"}, status=400)
+
+        data = {
+            "name": employee.employee_name,
+            "email": employee.employee_email,
+            "phone": employee.employee_phone,
+            "birth_date": employee.employee_birth_date.strftime('%d/%m/%Y') if employee.employee_birth_date else 'Não informado',
+            "hire_date": employee.employee_hire_date.strftime('%H:%M - %d/%m/%Y') if employee.employee_hire_date else 'Não informado',
+            "department": {
+                "name": employee.employee_department.department_name,
+                "description": employee.employee_department.department_description,
+            },
+            "address": {
+                "street": employee.employee_address.address_street if employee.employee_address else None,
+                "neighborhood": employee.employee_address.address_neighborhood if employee.employee_address else None,
+                "number": employee.employee_address.address_number if employee.employee_address else None,
+                "city": employee.employee_address.address_city if employee.employee_address else None,
+                "zip_code": employee.employee_address.address_zip_code if employee.employee_address else None,
+                "country": employee.employee_address.address_country if employee.employee_address else None
+            },
+            "function": {
+                "title": employee.employee_function.function_title if employee.employee_function else "Não definido",
+                "salary": str(employee.employee_function.function_salary) if employee.employee_function and employee.employee_function.function_salary else "Não definido"
+            }
+        }
+
+        return Response({"success": True, "data": data}, status=200)
+    
