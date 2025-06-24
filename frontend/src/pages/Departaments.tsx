@@ -1,7 +1,7 @@
 import { createResource, createSignal, For, Show } from 'solid-js';
 import axios from 'axios';
 import { Eye, Trash2, Pencil, Plus, X } from 'lucide-solid';
-import { viewDepartment } from '../api/departaments';
+import { viewDepartment, deleteDepartment } from '../api/departaments';
 
 const fetchDepartments = async () => {
   const response = await axios.get('http://127.0.0.1:8000/departamentos/');
@@ -9,7 +9,7 @@ const fetchDepartments = async () => {
 };
 
 export default function Departments() {
-  const [departments] = createResource(fetchDepartments);
+  const [departments, { refetch }] = createResource(fetchDepartments);
   const [modalOpen, setModalOpen] = createSignal(false);
   const [selectedDepartment, setSelectedDepartment] = createSignal<any>(null);
   const [loadingModal, setLoadingModal] = createSignal(false);
@@ -24,6 +24,19 @@ export default function Departments() {
       alert('Erro ao buscar dados do departamento.');
     } finally {
       setLoadingModal(false);
+    }
+  }
+
+  async function handleDelete(id: number) {
+    const confirmDelete = confirm('Tem certeza que deseja excluir este departamento?');
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDepartment(id);
+      alert('Departamento deletado com sucesso.');
+      refetch();
+    } catch (error) {
+      alert('Erro ao deletar departamento.');
     }
   }
 
@@ -43,10 +56,12 @@ export default function Departments() {
                     <Eye class="w-4" />
                   </button>
                   <div class='flex gap-1'>
-                    <button class="btn btn-secondary">
+                    <button class="btn btn-secondary" onClick={() => {
+                      window.location.href = `/departamento/${dep.id}/alterar`;
+                    }}>
                       <Pencil class="w-4" />
                     </button>
-                    <button class="btn btn-error text-white">
+                    <button class="btn btn-error text-white" onClick={() => handleDelete(dep.id)}>
                       <Trash2 class="w-4" />
                     </button>
                   </div>
@@ -70,18 +85,16 @@ export default function Departments() {
 
       {/* Modal */}
       <Show when={modalOpen()}>
-  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-xl relative">
-      {/* Botão fechar */}
-      <button
-        class="absolute top-3 right-3 text-gray-500 hover:text-red-500 transition"
-        onClick={() => setModalOpen(false)}
-      >
-        <X class="w-5 h-5" />
-      </button>
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-xl relative">
+            <button
+              class="absolute top-3 right-3 text-gray-500 hover:text-red-500 transition"
+              onClick={() => setModalOpen(false)}
+            >
+              <X class="w-5 h-5" />
+            </button>
 
-      {/* Conteúdo */}
-      <Show when={!loadingModal()} fallback={<p class="text-center">Carregando dados...</p>}>
+            <Show when={!loadingModal()} fallback={<p class="text-center">Carregando dados...</p>}>
               <h2 class="text-3xl font-bold mb-4 text-neutral-800">{selectedDepartment().name}</h2>
 
               <div class="space-y-2">

@@ -1,8 +1,9 @@
 import { createStore } from 'solid-js/store';
-import { createDepartment } from '../api/departaments';
-import { useNavigate } from '@solidjs/router';
+import { useNavigate, useParams } from '@solidjs/router';
+import { viewDepartment, updateDepartment } from '../api/departaments';
+import { onMount } from 'solid-js';
 
-interface CreateDepartment {
+interface UpdateDepartment {
   name: string;
   description: string;
   phone: string;
@@ -17,8 +18,9 @@ interface CreateDepartment {
   };
 }
 
-export default function DepartmentForm() {
+export default function DepartmentEditForm() {
   const navigate = useNavigate();
+  const params = useParams();
 
   const [form, setForm] = createStore({
     nome: '',
@@ -33,6 +35,27 @@ export default function DepartmentForm() {
     uf: '',
   });
 
+  onMount(async () => {
+    try {
+      const data = await viewDepartment(params.id);
+      setForm({
+        nome: data.name,
+        descricao: data.description,
+        telefone: data.phone,
+        gerente: data.manager,
+        rua: data.address.street,
+        bairro: data.address.neighborhood,
+        numero: data.address.number,
+        cep: data.address.zip_code,
+        cidade: data.address.city,
+        uf: data.address.country,
+      });
+    } catch (error) {
+      alert('Erro ao carregar departamento.');
+      navigate('/departamentos');
+    }
+  });
+
   function handleChange(e: Event) {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement;
     const { name, value } = target;
@@ -42,7 +65,7 @@ export default function DepartmentForm() {
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
-    const payload: CreateDepartment = {
+    const payload: UpdateDepartment = {
       name: form.nome,
       description: form.descricao,
       phone: form.telefone,
@@ -53,16 +76,16 @@ export default function DepartmentForm() {
         number: form.numero,
         zip_code: form.cep,
         city: form.cidade,
-        country: form.uf, // Pode ser 'SP' ou 'Brasil' conforme backend
+        country: form.uf,
       },
     };
 
     try {
-      await createDepartment(payload);
-      alert('Departamento criado com sucesso!');
-      navigate('/');
+      await updateDepartment(params.id, payload);
+      alert('Departamento atualizado com sucesso!');
+      navigate('/departamentos');
     } catch (error) {
-      alert('Erro ao criar departamento. Verifique os dados e tente novamente.');
+      alert('Erro ao atualizar departamento.');
     }
   }
 
@@ -73,11 +96,11 @@ export default function DepartmentForm() {
           <ul>
             <li><a href="/">Dashboard</a></li>
             <li><a href="/departamentos">Departamentos</a></li>
-            <li>Criar Departamento</li>
+            <li>Editar Departamento</li>
           </ul>
         </div>
 
-        <h1 class="text-3xl font-bold mb-6">Cadastro de Departamento</h1>
+        <h1 class="text-3xl font-bold mb-6">Editar Departamento</h1>
 
         <form onSubmit={handleSubmit} class="flex flex-col gap-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,7 +255,7 @@ export default function DepartmentForm() {
           </div>
 
           <div class="flex justify-end gap-2 mt-6">
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
             <a href="/">
               <button type="button" class="btn btn-error">Cancelar</button>
             </a>
