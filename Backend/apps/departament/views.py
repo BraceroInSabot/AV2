@@ -252,3 +252,51 @@ class EmployeeCreateView(APIView):
             status=201
         )
     
+class EmployeeUpdateView(APIView):
+    def put(self, request, pk, fpk):
+        data = request.data
+        try:
+            employee = Employee.objects.get(
+                employee_ID=fpk,
+                employee_department__department_ID=pk
+            )
+        except Employee.DoesNotExist:
+            return Response({"success": False, "message": "Funcionário não encontrado."}, status=404)
+
+        if 'name' in data:
+            employee.employee_name = data['name']
+        if 'email' in data:
+            employee.employee_email = data['email']
+        if 'phone' in data:
+            employee.employee_phone = data['phone']
+        if 'birth_date' in data:
+            employee.employee_birth_date = data['birth_date']
+
+        if 'address' in data:
+            address_data = data['address']
+            address, created = Address.objects.update_or_create(
+                address_ID=employee.employee_address.address_ID,
+                defaults={
+                    'address_street': address_data.get('street'),
+                    'address_neighborhood': address_data.get('neighborhood'),
+                    'address_number': address_data.get('number'),
+                    'address_city': address_data.get('city'),
+                    'address_zip_code': address_data.get('zip_code'),
+                    'address_country': address_data.get('country')
+                }
+            )
+            employee.employee_address = address
+
+        if 'function' in data:
+            function_data = data['function']
+            function, created = Function.objects.update_or_create(
+                function_ID=employee.employee_function.function_ID,
+                defaults={
+                    'function_title': function_data.get('title'),
+                    'function_salary': function_data.get('salary')
+                }
+            )
+            employee.employee_function = function
+
+        employee.save()
+        return Response({"success": True, "message": "Funcionário atualizado com sucesso."}, status=200)
