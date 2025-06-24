@@ -4,7 +4,8 @@ from .views import (
     DepartamentDetailView,
     DepartmentCreateView,
     DepartmentUpdateView,
-    DepartmentDeleteView)
+    DepartmentDeleteView,
+    EmployeeListView)
 
 urlpatterns = [
     path('', DepartamentListView.as_view(), name='departament-list'),
@@ -12,4 +13,6 @@ urlpatterns = [
     path('criar/', DepartmentCreateView.as_view(), name='departament-create'),
     path('alterar/<int:pk>/', DepartmentUpdateView.as_view(), name='departament-update'),
     path('deletar/<int:pk>/', DepartmentDeleteView.as_view(), name='departament-delete'),
+] + [
+    path('<int:pk>/funcionarios/', EmployeeListView.as_view(), name='employee-list'),
 ]

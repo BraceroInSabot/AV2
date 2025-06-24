@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import Departament, Address, Function, Employee
 
+# Department
+
 class DepartamentListView(APIView):
     permission_classes = [AllowAny]
     
@@ -138,3 +140,29 @@ class DepartmentDeleteView(APIView):
             return Response({"success": False, "message": "Departamento não encontrado."}, status=404)
         except Exception as e:
             return Response({"success": False, "message": str(e)}, status=400)
+        
+# Employees
+
+class EmployeeListView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, pk=None):
+        department = Departament.objects.get(department_ID=pk)
+        try:
+            employees = Employee.objects.filter(employee_department=department)
+        except:
+            return Response({"success": False, "message": "Erro ao buscar funcionários."}, status=400)
+
+        data = {
+            "employees": [
+                {
+                    "id": employee.employee_ID,
+                    "name": employee.employee_name,
+                    "email": employee.employee_email,
+                    "phone": employee.employee_phone,
+                    "function_title": employee.employee_function.function_title if employee.employee_function else "Não definido", 
+                    "department": employee.employee_department.department_name if employee.employee_department else None
+                } for employee in employees
+            ]
+        }
+        return Response({"success": True, "data": data}, status=200)

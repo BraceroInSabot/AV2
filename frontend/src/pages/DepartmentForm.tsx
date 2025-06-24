@@ -71,8 +71,7 @@ export default function DepartmentForm() {
       <div class="bg-base-100 rounded-xl shadow-lg w-full max-w-4xl p-8">
         <div class="breadcrumbs text-sm mb-4">
           <ul>
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/departamentos">Departamentos</a></li>
+            <li><a href="/">Departamentos</a></li>
             <li>Criar Departamento</li>
           </ul>
         </div>

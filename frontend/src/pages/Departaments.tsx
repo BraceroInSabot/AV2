@@ -1,6 +1,6 @@
 import { createResource, createSignal, For, Show } from 'solid-js';
 import axios from 'axios';
-import { Eye, Trash2, Pencil, Plus, X } from 'lucide-solid';
+import { Eye, Trash2, Pencil, Plus, X, Users } from 'lucide-solid';
 import { viewDepartment, deleteDepartment } from '../api/departaments';
 
 const fetchDepartments = async () => {
@@ -52,9 +52,18 @@ export default function Departments() {
                 <h2 class="text-xl font-bold">{dep.name}</h2>
                 <p class="h-15 font-extralight mb-4">{dep.description}</p>
                 <div class='flex items-center justify-between'>
-                  <button class="btn btn-primary" onClick={() => handleView(dep.id)}>
-                    <Eye class="w-4" />
-                  </button>
+                  <div class='flex gap-1'>
+                    <button class="btn btn-primary" onClick={() => {
+                      window.location.href = `/departamento/${dep.id}/alterar`;
+                    }}>
+                      <Eye class="w-4" />
+                    </button>
+                    <button class="btn btn-neutral" onClick={() => {
+                      window.location.href = `/departamento/${dep.id}/funcionarios`;
+                    }}>
+                      <Users class="w-4" />
+                    </button>
+                  </div>
                   <div class='flex gap-1'>
                     <button class="btn btn-secondary" onClick={() => {
                       window.location.href = `/departamento/${dep.id}/alterar`;
