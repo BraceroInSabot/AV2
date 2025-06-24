@@ -21,6 +21,14 @@ interface CreateDepartment {
     department_description: string;
     department_phone: string;
     department_manager: string;
+    address: {
+        street: string;
+        neighborhood: string;
+        number: string;
+        zip_code: string;
+        city: string;
+        country: string;
+      },
 }
 
 export async function createDepartment(departmentData: CreateDepartment) {

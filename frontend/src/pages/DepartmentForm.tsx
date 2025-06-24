@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import { createDepartment } from '../api/departaments'; // ajuste conforme seu path
+import { createDepartment } from '../api/departaments';
 import { useNavigate } from '@solidjs/router';
 
 export default function DepartmentForm() {
@@ -10,6 +10,12 @@ export default function DepartmentForm() {
     descricao: '',
     telefone: '',
     gerente: '',
+    rua: '',
+    bairro: '',
+    numero: '',
+    cep: '',
+    cidade: '',
+    uf: '',
   });
 
   function handleChange(e: Event) {
@@ -26,6 +32,14 @@ export default function DepartmentForm() {
       department_description: form.descricao,
       department_phone: form.telefone,
       department_manager: form.gerente,
+      address: {
+        street: form.rua,
+        neighborhood: form.bairro,
+        number: form.numero,
+        zip_code: form.cep,
+        city: form.cidade,
+        uf: form.uf,
+      },
     };
 
     try {
@@ -114,14 +128,98 @@ export default function DepartmentForm() {
             />
           </label>
 
-          <div class="flex justify-end gap-2">
-            <button type="submit" class="btn btn-primary">
-              Salvar
-            </button>
+          <div class="overflow-x-auto">
+            <h2 class='font-bold pl-4 text-2xl'>Endereço</h2>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Rua</th>
+                  <th>Bairro</th>
+                  <th>Número</th>
+                  <th>CEP</th>
+                  <th>Cidade</th>
+                  <th>UF</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      name="rua"
+                      value={form.rua}
+                      onInput={handleChange}
+                      placeholder="Rua"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="bairro"
+                      value={form.bairro}
+                      onInput={handleChange}
+                      placeholder="Bairro"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="numero"
+                      value={form.numero}
+                      onInput={handleChange}
+                      placeholder="Número"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="cep"
+                      value={form.cep}
+                      onInput={handleChange}
+                      placeholder="00000-000"
+                      pattern="\d{5}-?\d{3}"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="cidade"
+                      value={form.cidade}
+                      onInput={handleChange}
+                      placeholder="Cidade"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="uf"
+                      value={form.uf}
+                      onInput={handleChange}
+                      placeholder="UF"
+                      maxLength={2}
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex justify-end gap-2 mt-6">
+            <button type="submit" class="btn btn-primary">Salvar</button>
             <a href="/departamentos">
-              <button type="button" class="btn btn-error">
-                Cancelar
-              </button>
+              <button type="button" class="btn btn-error">Cancelar</button>
             </a>
           </div>
         </form>

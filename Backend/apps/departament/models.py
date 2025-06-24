@@ -3,8 +3,9 @@ from django.db import models
 class Address(models.Model):
     address_ID = models.AutoField(primary_key=True, db_column='address_ID')
     address_street = models.CharField(max_length=255, db_column='address_street', blank=True, null=True)
+    address_neighborhood = models.CharField(max_length=100, db_column='address_neighborhood', blank=True, null=True)
+    address_number = models.CharField(max_length=8, db_column='address_number', blank=True, null=True)
     address_city = models.CharField(max_length=100, db_column='address_city', blank=True, null=True)
-    address_state = models.CharField(max_length=100, db_column='address_state', blank=True, null=True)
     address_zip_code = models.CharField(max_length=20, db_column='address_zip_code', blank=True, null=True)
     address_country = models.CharField(max_length=100, db_column='address_country', blank=True, null=True)
 
