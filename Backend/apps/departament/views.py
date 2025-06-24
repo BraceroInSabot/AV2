@@ -300,3 +300,17 @@ class EmployeeUpdateView(APIView):
 
         employee.save()
         return Response({"success": True, "message": "Funcionário atualizado com sucesso."}, status=200)
+    
+class EmployeeDeleteView(APIView):
+    def delete(self, request, pk, fpk):
+        try:
+            employee = Employee.objects.get(
+                employee_ID=fpk,
+                employee_department__department_ID=pk
+            )
+            employee.delete()
+            return Response({"success": True, "message": "Funcionário deletado com sucesso."}, status=204)
+        except Employee.DoesNotExist:
+            return Response({"success": False, "message": "Funcionário não encontrado."}, status=404)
+        except Exception as e:
+            return Response({"success": False, "message": str(e)}, status=400)
