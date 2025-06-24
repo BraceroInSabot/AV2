@@ -18,17 +18,6 @@ class DepartamentListView(APIView):
                     "id": department.department_ID,
                     "name": department.department_name,
                     "description": department.department_description,
-                    "phone": department.department_phone,
-                    "created_at": department.department_created_at,
-                    "manager": department.department_manager,
-                    "address": {
-                        "street": department.department_address.address_street if department.department_address else None,
-                        'neighborhood': department.department_address.address_neighborhood if department.department_address else None,
-                        "number": department.department_address.address_number if department.department_address else None,
-                        "city": department.department_address.address_city if department.department_address else None,
-                        "zip_code": department.department_address.address_zip_code if department.department_address else None,
-                        "country": department.department_address.address_country if department.department_address else None
-                    }
                 } for department in dep
             ]
         }
@@ -72,7 +61,7 @@ class DepartmentCreateView(APIView):
         address_data = data.get('address', {})
 
         # Validações básicas
-        if not data.get('department_name'):
+        if not data.get('name'):
             return Response({"success": False, "message": "O nome do departamento é obrigatório."}, status=400)
 
         if not address_data:
@@ -89,23 +78,21 @@ class DepartmentCreateView(APIView):
             address_number=address_data.get('number'),
             address_zip_code=address_data.get('zip_code'),
             address_city=address_data.get('city'),
-            address_country=address_data.get('uf')
+            address_country=address_data.get('country')
         )
 
         # Criação do departamento
         department = Departament.objects.create(
-            department_name=data.get('department_name'),
-            department_description=data.get('department_description'),
-            department_phone=data.get('department_phone'),
-            department_manager=data.get('department_manager'),
+            department_name=data.get('name'),
+            department_description=data.get('description'),
+            department_phone=data.get('phone'),
+            department_manager=data.get('manager'),
             department_address=address
         )
         return Response(
             {"success": True, "message": "Departamento criado com sucesso."},
             status=201
-        )
-
-        
+        )        
 
 class DepartmentUpdateView(APIView):
     def put(self, request, pk):

@@ -2,6 +2,21 @@ import { createStore } from 'solid-js/store';
 import { createDepartment } from '../api/departaments';
 import { useNavigate } from '@solidjs/router';
 
+interface CreateDepartment {
+  name: string;
+  description: string;
+  phone: string;
+  manager: string;
+  address: {
+    street: string;
+    neighborhood: string;
+    number: string;
+    zip_code: string;
+    city: string;
+    country: string;
+  };
+}
+
 export default function DepartmentForm() {
   const navigate = useNavigate();
 
@@ -27,25 +42,25 @@ export default function DepartmentForm() {
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
-    const payload = {
-      department_name: form.nome,
-      department_description: form.descricao,
-      department_phone: form.telefone,
-      department_manager: form.gerente,
+    const payload: CreateDepartment = {
+      name: form.nome,
+      description: form.descricao,
+      phone: form.telefone,
+      manager: form.gerente,
       address: {
         street: form.rua,
         neighborhood: form.bairro,
         number: form.numero,
         zip_code: form.cep,
         city: form.cidade,
-        uf: form.uf,
+        country: form.uf, // Pode ser 'SP' ou 'Brasil' conforme backend
       },
     };
 
     try {
       await createDepartment(payload);
       alert('Departamento criado com sucesso!');
-      navigate('/');
+      navigate('/departamentos');
     } catch (error) {
       alert('Erro ao criar departamento. Verifique os dados e tente novamente.');
     }
