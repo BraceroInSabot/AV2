@@ -202,3 +202,53 @@ class EmployeeDetailView(APIView):
 
         return Response({"success": True, "data": data}, status=200)
     
+class EmployeeCreateView(APIView):
+    def post(self, request, pk):
+        data = request.data
+        try:
+            department = Departament.objects.get(department_ID=pk)
+        except Departament.DoesNotExist:
+            return Response({"success": False, "message": "Departamento não encontrado."}, status=404)
+
+        # Validações básicas
+        if not data.get('name'):
+            return Response({"success": False, "message": "O nome do funcionário é obrigatório."}, status=400)
+
+        # Criação do endereço se fornecido
+        address_data = data.get('address', {})
+        address = None
+        if address_data:
+            address = Address.objects.create(
+                address_street=address_data.get('street'),
+                address_neighborhood=address_data.get('neighborhood'),
+                address_number=address_data.get('number'),
+                address_city=address_data.get('city'),
+                address_zip_code=address_data.get('zip_code'),
+                address_country=address_data.get('country')
+            )
+
+        # Criação da função se fornecida
+        function_data = data.get('function', {})
+        function = None
+        if function_data:
+            function = Function.objects.create(
+                function_title=function_data.get('title'),
+                function_salary=function_data.get('salary')
+            )
+
+        # Criação do funcionário
+        employee = Employee.objects.create(
+            employee_name=data['name'],
+            employee_email=data.get('email'),
+            employee_phone=data.get('phone'),
+            employee_birth_date=data.get('birth_date'),
+            employee_department=department,
+            employee_address=address,
+            employee_function=function
+        )
+
+        return Response(
+            {"success": True, "message": "Funcionário criado com sucesso.", "employee_id": employee.employee_ID},
+            status=201
+        )
+    
