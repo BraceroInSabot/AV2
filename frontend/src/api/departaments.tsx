@@ -104,4 +104,15 @@ export async function updateDepartment(id: string | number, payload: UpdateDepar
     throw error;
   }
 }
-// http://127.0.0.1:8000/departamentos/deletar/1/
+
+// Listar Funcionários de um Departamento
+
+export async function getDepartmentEmployees(id: number) {
+  try {
+    const response = await axios.get(`${BASE_URL}/departamentos/${id}/funcionarios/`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar funcionários do departamento:', error);
+    throw error;
+  }
+}
