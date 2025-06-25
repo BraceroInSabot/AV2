@@ -52,7 +52,7 @@ export default function DepartmentEditForm() {
       });
     } catch (error) {
       alert('Erro ao carregar departamento.');
-      navigate('/departamentos');
+      navigate('/');
     }
   });
 
@@ -83,7 +83,7 @@ export default function DepartmentEditForm() {
     try {
       await updateDepartment(params.id, payload);
       alert('Departamento atualizado com sucesso!');
-      navigate('/departamentos');
+      navigate('/');
     } catch (error) {
       alert('Erro ao atualizar departamento.');
     }

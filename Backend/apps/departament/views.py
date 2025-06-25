@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import Departament, Address, Function, Employee
+from django.utils.timezone import localtime
 
 # Department
 
@@ -43,7 +44,7 @@ class DepartamentDetailView(APIView):
             "name": dep.department_name,
             "description": dep.department_description,
             "phone": dep.department_phone,
-            "created_at": dep.department_created_at.strftime('%H:%M - %d/%m/%Y') if dep.department_created_at else None,
+            "created_at": localtime(dep.department_created_at).strftime('%H:%M - %d/%m/%Y') if dep.department_created_at else None,
             "manager": dep.department_manager,
             "address": {
                 "street": dep.department_address.address_street if dep.department_address else None,
@@ -181,7 +182,7 @@ class EmployeeDetailView(APIView):
             "email": employee.employee_email,
             "phone": employee.employee_phone,
             "birth_date": employee.employee_birth_date.strftime('%d/%m/%Y') if employee.employee_birth_date else 'Não informado',
-            "hire_date": employee.employee_hire_date.strftime('%H:%M - %d/%m/%Y') if employee.employee_hire_date else 'Não informado',
+            "hire_date": localtime(employee.employee_hire_date).strftime('%H:%M - %d/%m/%Y') if employee.employee_hire_date else 'Não informado',
             "department": {
                 "name": employee.employee_department.department_name,
                 "description": employee.employee_department.department_description,
@@ -224,7 +225,7 @@ class EmployeeCreateView(APIView):
                 address_number=address_data.get('number'),
                 address_city=address_data.get('city'),
                 address_zip_code=address_data.get('zip_code'),
-                address_country=address_data.get('country')
+                address_country=address_data.get('uf')
             )
 
         # Criação da função se fornecida

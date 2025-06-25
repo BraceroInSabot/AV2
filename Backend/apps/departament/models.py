@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import localtime, now
 
 class Address(models.Model):
     address_ID = models.AutoField(primary_key=True, db_column='address_ID')
@@ -47,7 +48,7 @@ class Employee(models.Model):
     employee_email = models.EmailField(max_length=255, db_column='employee_email', blank=True, null=True)
     employee_phone = models.CharField(max_length=15, db_column='employee_phone', blank=True, null=True)
     employee_birth_date = models.DateField(db_column='employee_birth_date', blank=True, null=True)
-    employee_hire_date = models.DateTimeField(auto_now_add=True, db_column='employee_hire_date')
+    employee_hire_date = models.DateTimeField(default=lambda: localtime(now()), db_column='employee_hire_date')
     employee_department = models.ForeignKey(Departament, on_delete=models.CASCADE, db_column='employee_department', blank=False, null=False)
     employee_address = models.ForeignKey(Address, on_delete=models.CASCADE, db_column='employee_address', blank=True, null=True)
     employee_function = models.ForeignKey(Function, on_delete=models.CASCADE, db_column='employee_function', blank=True, null=True)

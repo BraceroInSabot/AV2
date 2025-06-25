@@ -36,6 +36,9 @@ export default function Employees() {
   const [modalOpen, setModalOpen] = createSignal(false);
   const [selectedEmployee, setSelectedEmployee] = createSignal<EmployeeDetails | null>(null);
 
+  // Novo estado para o termo de busca
+  const [searchTerm, setSearchTerm] = createSignal('');
+
   onMount(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key.toLowerCase() === 'f') {
@@ -46,6 +49,13 @@ export default function Employees() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   });
+
+  const filteredEmployees = () => {
+    const term = searchTerm().toLowerCase();
+    return (employees()?.data?.employees as EmployeeSummary[] || []).filter(emp =>
+      emp.name.toLowerCase().includes(term)
+    );
+  };
 
   async function handleView(employee: EmployeeSummary) {
     try {
@@ -74,12 +84,12 @@ export default function Employees() {
       <div class="bg-white p-4">
         <div class="breadcrumbs text-sm">
           <ul>
-            <li><a href='/'>Departamento Nome</a></li>
+            <li><a href='/'>Departamentos</a></li>
             <li>Funcionários</li>
           </ul>
         </div>
 
-        <div class='flex items-center justify-between p-4'>
+        <div class='flex items-center justify-between pt-4 pb-2'>
           <h1 class="font-bold text-4xl">Funcionários</h1>
           <label class="input">
             <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -88,7 +98,9 @@ export default function Employees() {
                 <path d="m21 21-4.3-4.3"></path>
               </g>
             </svg>
-            <input ref={el => (inputRef = el)} type="search" class="grow" placeholder="Search" />
+            <input ref={el => (inputRef = el)} type="search" class="grow" placeholder="Search" 
+            value={searchTerm()}
+            onInput={e => setSearchTerm(e.currentTarget.value)}/>
             <kbd class="kbd kbd-sm">ctrl</kbd>
             <kbd class="kbd kbd-sm">F</kbd>
           </label>
@@ -98,7 +110,7 @@ export default function Employees() {
         </div>
 
         <Show when={employees()} fallback={<p class="p-4">Carregando funcionários...</p>}>
-          <For each={employees()?.data?.employees as EmployeeSummary[]}>
+          <For each={filteredEmployees() as EmployeeSummary[]}>
             {(employee) => (
               <ul class="list bg-base-100 rounded-box shadow-md mt-2">
                 <li class="list-row flex items-center gap-4 px-4 py-2">

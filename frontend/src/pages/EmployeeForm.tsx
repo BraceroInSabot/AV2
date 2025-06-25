@@ -18,7 +18,7 @@ export default function EmployeeForm() {
       number: '',
       city: '',
       zip_code: '',
-      uf: '',
+      country: '',
     },
     function: {
       title: '',
@@ -51,7 +51,7 @@ export default function EmployeeForm() {
 
       await createDepartmentEmployee(departmentId, form);
       alert('Funcionário criado com sucesso.');
-      navigate(`/departmento/${departmentId}/funcionarios`);
+      navigate(`/departamento/${departmentId}/funcionarios`);
     } catch (err) {
       console.error('Erro ao enviar funcionário:', err);
       alert('Erro ao criar funcionário. Verifique os dados e tente novamente.');
@@ -197,7 +197,7 @@ export default function EmployeeForm() {
                     <input
                       type="text"
                       name="address.uf"
-                      value={form.address.uf}
+                      value={form.address.country}
                       onInput={handleChange}
                       placeholder="UF"
                       maxLength={2}
