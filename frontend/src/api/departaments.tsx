@@ -128,3 +128,15 @@ export async function createDepartmentEmployee(id: number, employeeData: any) {
     throw error;
   }
 }
+
+// Consultar Funcionário de um Departamento
+
+export async function viewDepartmentEmployee(departmentId: number, employeeId: number) {
+  try {
+    const response = await axios.get(`${BASE_URL}/departamentos/${departmentId}/funcionarios/${employeeId}/`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Erro ao buscar funcionário do departamento:', error);
+    throw error;
+  }
+}

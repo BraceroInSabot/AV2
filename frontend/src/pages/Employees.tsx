@@ -1,7 +1,27 @@
 import { createResource, createSignal, Show, For, onMount } from 'solid-js';
 import { useParams } from '@solidjs/router';
-import { getDepartmentEmployees } from '../api/departaments';
+import { getDepartmentEmployees, viewDepartmentEmployee } from '../api/departaments';
 import { Trash2, Pencil, Eye, X } from 'lucide-solid';
+
+type EmployeeSummary = {
+  id: number;
+  name: string;
+  function_title: string;
+};
+
+type EmployeeDetails = {
+  id: number;
+  name: string;
+  function: {
+    title: string;
+    salary: string;
+  };
+  email: string;
+  phone: string;
+  admission_date: string;
+  salary: string;
+  hire_date: string;
+};
 
 export default function Employees() {
   let inputRef: HTMLInputElement | undefined;
@@ -10,7 +30,7 @@ export default function Employees() {
   const [employees] = createResource(() => Number(params.id), getDepartmentEmployees);
 
   const [modalOpen, setModalOpen] = createSignal(false);
-  const [selectedEmployee, setSelectedEmployee] = createSignal<any>(null);
+  const [selectedEmployee, setSelectedEmployee] = createSignal<EmployeeDetails | null>(null);
 
   onMount(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -23,9 +43,15 @@ export default function Employees() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   });
 
-  function handleView(employee: any) {
-    setSelectedEmployee(employee);
-    setModalOpen(true);
+  async function handleView(employee: EmployeeSummary) {
+    try {
+      const data = await viewDepartmentEmployee(Number(params.id), employee.id);
+      console.log('Detalhes do funcionário:', data);
+      setSelectedEmployee(data);
+      setModalOpen(true);
+    } catch (err) {
+      console.error('Erro ao carregar detalhes do funcionário:', err);
+    }
   }
 
   return (
@@ -57,7 +83,7 @@ export default function Employees() {
         </div>
 
         <Show when={employees()} fallback={<p class="p-4">Carregando funcionários...</p>}>
-          <For each={employees()?.data?.employees}>
+          <For each={employees()?.data?.employees as EmployeeSummary[]}>
             {(employee) => (
               <ul class="list bg-base-100 rounded-box shadow-md mt-2">
                 <li class="list-row flex items-center gap-4 px-4 py-2">
@@ -101,11 +127,11 @@ export default function Employees() {
             <h2 class="text-3xl font-bold mb-4 text-neutral-800">{selectedEmployee()?.name}</h2>
 
             <div class="space-y-2 text-neutral-700">
-              <p><strong>Função:</strong> {selectedEmployee()?.function_title}</p>
+              <p><strong>Função:</strong> {selectedEmployee()?.function.title}</p>
               <p><strong>Email:</strong> {selectedEmployee()?.email}</p>
               <p><strong>Telefone:</strong> {selectedEmployee()?.phone}</p>
-              <p><strong>Admissão:</strong> {selectedEmployee()?.admission_date}</p>
-              <p><strong>Salário:</strong> R$ {selectedEmployee()?.salary}</p>
+              <p><strong>Admissão:</strong> {selectedEmployee()?.hire_date}</p>
+              <p><strong>Salário:</strong> R$ {selectedEmployee()?.function.salary}</p>
             </div>
           </div>
         </div>
