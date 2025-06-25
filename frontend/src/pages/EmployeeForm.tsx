@@ -51,7 +51,7 @@ export default function EmployeeForm() {
 
       await createDepartmentEmployee(departmentId, form);
       alert('Funcionário criado com sucesso.');
-      navigate(`/departments/${departmentId}/funcionarios`);
+      navigate(`/departmento/${departmentId}/funcionarios`);
     } catch (err) {
       console.error('Erro ao enviar funcionário:', err);
       alert('Erro ao criar funcionário. Verifique os dados e tente novamente.');

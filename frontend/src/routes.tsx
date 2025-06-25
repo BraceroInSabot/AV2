@@ -5,6 +5,7 @@ import Employees from "./pages/Employees";
 import EmployeeForm from "./pages/EmployeeForm";
 import DepartmentForm from "./pages/DepartmentForm";
 import DepartmentEditForm from "./pages/DepartmentsUpdate";
+import DepartmentEmployeeEditForm from "./pages/EmployeeUpdate"
 
 export default function RouterMap() {
   return (
@@ -15,6 +16,7 @@ export default function RouterMap() {
       <Route path="departamento/:id/funcionarios" component={Employees} />
       <Route path="departamento/:id/funcionario/criar" component={EmployeeForm} />
       <Route path="departamento/criar" component={DepartmentForm} />
+      <Route path="departamento/:id/funcionario/alterar/:employeeId" component={DepartmentEmployeeEditForm} />
     </>
   );
 }

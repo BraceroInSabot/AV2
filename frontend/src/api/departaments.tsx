@@ -152,3 +152,15 @@ export async function deleteDepartmentEmployee(departmentId: number, employeeId:
     throw error;
   }
 }
+
+// Atualizar Funcionário de um Departamento
+
+export async function updateDepartmentEmployee(departmentId: number, employeeId: number, employeeData: any) {
+  try {
+    const response = await axios.put(`${BASE_URL}/departamentos/${departmentId}/funcionarios/alterar/${employeeId}/`, employeeData);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar funcionário do departamento:', error);
+    throw error;
+  }
+}

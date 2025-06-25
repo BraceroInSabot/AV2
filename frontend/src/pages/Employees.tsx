@@ -116,7 +116,9 @@ export default function Employees() {
                     <button class="btn btn-square btn-ghost" onClick={() => handleView(employee)}>
                       <Eye style={{ color: '#0080ff' }} />
                     </button>
-                    <button class="btn btn-square btn-ghost">
+                    <button class="btn btn-square btn-ghost" onClick={() => {
+                      window.location.href = `/departamento/${params.id}/funcionario/alterar/${employee.id}`;
+                    }}>
                       <Pencil style={{ color: '#DAA520' }} />
                     </button>
                     <button class="btn btn-square btn-ghost" onClick={() => handleDelete(employee)}>
