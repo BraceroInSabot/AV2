@@ -140,3 +140,15 @@ export async function viewDepartmentEmployee(departmentId: number, employeeId: n
     throw error;
   }
 }
+
+// Deletar Funcionário de um Departamento
+
+export async function deleteDepartmentEmployee(departmentId: number, employeeId: number) {
+  try {
+    const response = await axios.delete(`${BASE_URL}/departamentos/${departmentId}/funcionarios/deletar/${employeeId}/`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Erro ao deletar funcionário do departamento:', error);
+    throw error;
+  }
+}

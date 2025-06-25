@@ -1,6 +1,10 @@
 import { createResource, createSignal, Show, For, onMount } from 'solid-js';
 import { useParams } from '@solidjs/router';
-import { getDepartmentEmployees, viewDepartmentEmployee } from '../api/departaments';
+import {
+  getDepartmentEmployees,
+  viewDepartmentEmployee,
+  deleteDepartmentEmployee
+} from '../api/departaments';
 import { Trash2, Pencil, Eye, X } from 'lucide-solid';
 
 type EmployeeSummary = {
@@ -27,7 +31,7 @@ export default function Employees() {
   let inputRef: HTMLInputElement | undefined;
 
   const params = useParams();
-  const [employees] = createResource(() => Number(params.id), getDepartmentEmployees);
+  const [employees, { refetch }] = createResource(() => Number(params.id), getDepartmentEmployees);
 
   const [modalOpen, setModalOpen] = createSignal(false);
   const [selectedEmployee, setSelectedEmployee] = createSignal<EmployeeDetails | null>(null);
@@ -46,11 +50,22 @@ export default function Employees() {
   async function handleView(employee: EmployeeSummary) {
     try {
       const data = await viewDepartmentEmployee(Number(params.id), employee.id);
-      console.log('Detalhes do funcionário:', data);
       setSelectedEmployee(data);
       setModalOpen(true);
     } catch (err) {
       console.error('Erro ao carregar detalhes do funcionário:', err);
+    }
+  }
+
+  async function handleDelete(employee: EmployeeSummary) {
+    const confirm = window.confirm(`Tem certeza que deseja remover ${employee.name}?`);
+    if (!confirm) return;
+
+    try {
+      await deleteDepartmentEmployee(Number(params.id), employee.id);
+      await refetch();
+    } catch (err) {
+      console.error('Erro ao deletar funcionário:', err);
     }
   }
 
@@ -87,7 +102,9 @@ export default function Employees() {
             {(employee) => (
               <ul class="list bg-base-100 rounded-box shadow-md mt-2">
                 <li class="list-row flex items-center gap-4 px-4 py-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-round-icon lucide-user-round">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-user-round-icon lucide-user-round">
                     <circle cx="12" cy="8" r="5" />
                     <path d="M20 21a8 8 0 0 0-16 0" />
                   </svg>
@@ -102,7 +119,7 @@ export default function Employees() {
                     <button class="btn btn-square btn-ghost">
                       <Pencil style={{ color: '#DAA520' }} />
                     </button>
-                    <button class="btn btn-square btn-ghost">
+                    <button class="btn btn-square btn-ghost" onClick={() => handleDelete(employee)}>
                       <Trash2 style={{ color: 'red' }} />
                     </button>
                   </div>
