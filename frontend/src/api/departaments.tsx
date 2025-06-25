@@ -116,3 +116,15 @@ export async function getDepartmentEmployees(id: number) {
     throw error;
   }
 }
+
+// Criar Funcionário em um Departamento
+
+export async function createDepartmentEmployee(id: number, employeeData: any) {
+  try {
+    const response = await axios.post(`${BASE_URL}/departamentos/${id}/funcionarios/criar/`, employeeData);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao criar funcionário no departamento:', error);
+    throw error;
+  }
+}

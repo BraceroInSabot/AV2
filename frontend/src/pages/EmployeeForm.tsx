@@ -1,231 +1,255 @@
 import { createStore } from 'solid-js/store';
-import { Eye, Trash2 } from 'lucide-solid';
+import { useParams, useNavigate } from '@solidjs/router';
+import { createDepartmentEmployee } from '../api/departaments';
 
 export default function EmployeeForm() {
+  const params = useParams();
+  const navigate = useNavigate();
+  const departmentId = Number(params.id);
+
   const [form, setForm] = createStore({
-    nome: "",
-    image: "",
-    email: "",
-    telefone: "",
-    inicioTurno: "",
-    fimTurno: "",
-    dataContratacao: "",
-    dataAniversario: "",
+    name: '',
+    email: '',
+    phone: '',
+    birth_date: '',
+    address: {
+      street: '',
+      neighborhood: '',
+      number: '',
+      city: '',
+      zip_code: '',
+      uf: '',
+    },
+    function: {
+      title: '',
+      salary: '',
+    },
   });
 
   function handleChange(e: Event) {
     const target = e.target as HTMLInputElement;
     const { name, value } = target;
-    setForm({ [name]: value });
+
+    if (name.startsWith('address.')) {
+      const field = name.split('.')[1];
+      setForm('address', field, value);
+    } else if (name.startsWith('function.')) {
+      const field = name.split('.')[1];
+      setForm('function', field, value);
+    } else {
+      setForm(name as keyof typeof form, value);
+    }
   }
 
-  function handleSubmit(e: Event) {
+  async function handleSubmit(e: Event) {
     e.preventDefault();
-    console.log("Dados enviados:", form);
+    try {
+      if (!departmentId || isNaN(departmentId)) {
+        console.error('ID do departamento inválido:', departmentId);  
+        throw new Error('ID do departamento inválido');
+      }
+
+      await createDepartmentEmployee(departmentId, form);
+      alert('Funcionário criado com sucesso.');
+      navigate(`/departments/${departmentId}/funcionarios`);
+    } catch (err) {
+      console.error('Erro ao enviar funcionário:', err);
+      alert('Erro ao criar funcionário. Verifique os dados e tente novamente.');
+    }
   }
 
   return (
     <div class="w-full min-h-screen bg-base-200 flex justify-center items-start p-6">
       <div class="bg-base-100 rounded-xl shadow-lg w-full max-w-4xl p-8">
-        <div class="breadcrumbs text-sm">
-          <ul>
-            <li><a href='/'>Departamento Nome</a></li>
-            <li><a href='/'>Funcionarios</a></li>
-            <li>João da Silva</li>
-          </ul>
-        </div>
-        <h1 class="text-3xl font-bold mb-6">Cadastro / Edição de Funcionários</h1>
+        <h1 class="text-3xl font-bold mb-6 pl-8">Cadastro de Funcionário</h1>
 
-        <form onSubmit={handleSubmit} class="flex flex-col gap-4">
-          {/* Header com foto e nome */}
-          <div class="flex gap-4 items-center">
-            <img
-              src={form.image || "https://external-preview.redd.it/he-literally-said-bruh-all-that-time-v0-bmxpeTdiY2FhYXpkMdJYX8DjN8ZpBWatLnq7gMPGfNXeT7VOSszpassJbNx_.png?format=pjpg&auto=webp&s=f603e93b8c934963e614fcf35c8c3fd854554c80"}
-              alt="Funcionário"
-              class="w-30 h-30 rounded-xl object-cover"
-            />
-            <div class="flex flex-1 flex-col gap-2">
-              <label class="form-control w-full">
-                <div class="label">
-                  <span class="label-text">Nome</span>
-                </div>
-                <input
-                  type="text"
-                  name="nome"
-                  value={form.nome}
-                  onInput={handleChange}
-                  placeholder="Digite o nome"
-                  class="input input-bordered w-full"
-                  required
-                />
-              </label>
-
-              <input
-                type="file"
-                name="image"
-                class="file-input file-input-bordered w-full"
-                onChange={(e) =>
-                  setForm({ image: URL.createObjectURL(e.target.files![0]) })
-                }
-              />
-            </div>
-          </div>
-
-          {/* Email e Telefone */}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} class="flex flex-col w-full gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 pr-8 pl-8 gap-4">
             <label class="form-control">
-              <div class="label">
-                <span class="label-text">Email</span>
-              </div><br />
+              <span class="label-text">Nome</span>
+              <br />
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onInput={handleChange}
+                placeholder="Digite o nome"
+                class="input input-bordered w-full"
+                required
+              />
+            </label>
+
+            <label class="form-control">
+              <span class="label-text">Email</span>
+              <br />
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onInput={handleChange}
                 placeholder="exemplo@empresa.com"
-                class="input input-bordered"
+                class="input input-bordered w-full"
                 required
               />
             </label>
+          </div>
 
+          <div class="grid grid-cols-1 md:grid-cols-2 pr-8 pl-8 gap-4">
             <label class="form-control">
-              <div class="label">
-                <span class="label-text">Telefone</span>
-              </div><br />
+              <span class="label-text">Telefone</span>
+              <br />
               <input
                 type="tel"
-                name="telefone"
-                value={form.telefone}
+                name="phone"
+                value={form.phone}
                 onInput={handleChange}
-                placeholder="11999999999"
-                pattern="\d{10,11}"
-                class="input input-bordered"
-              />
-            </label>
-          </div>
-
-          {/* Turno */}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="form-control">
-              <div class="label">
-                <span class="label-text">Início do Turno</span>
-              </div>
-              <input
-                type="time"
-                name="inicioTurno"
-                value={form.inicioTurno}
-                onInput={handleChange}
-                class="input input-bordered"
+                placeholder="(11) 99999-9999"
+                class="input input-bordered w-full"
                 required
               />
             </label>
 
             <label class="form-control">
-              <div class="label">
-                <span class="label-text">Fim do Turno</span>
-              </div>
-              <input
-                type="time"
-                name="fimTurno"
-                value={form.fimTurno}
-                onInput={handleChange}
-                class="input input-bordered"
-                required
-              />
-            </label>
-          </div>
-
-          {/* Datas */}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="form-control">
-              <div class="label">
-                <span class="label-text">Data de Contratação</span>
-              </div>
+              <span class="label-text">Data de Nascimento</span>
               <input
                 type="date"
-                name="dataContratacao"
-                value={form.dataContratacao}
+                name="birth_date"
+                value={form.birth_date}
                 onInput={handleChange}
-                class="input input-bordered"
+                class="input input-bordered w-full"
                 required
               />
             </label>
-
-            <label class="form-control">
-              <div class="label">
-                <span class="label-text">Data de Aniversário</span>
-              </div>
-              <input
-                type="date"
-                name="dataAniversario"
-                value={form.dataAniversario}
-                onInput={handleChange}
-                class="input input-bordered"
-              />
-            </label>
           </div>
 
-          {/* Lista Exemplo */}
-          <div class="overflow-x-auto">
-            <h2 class='font-bold pl-4 text-2xl'>Função</h2>
+          <div class="overflow-x-auto pl-4 pr-4">
+            <h2 class="font-bold pl-4 pr-10 text-2xl">Endereço</h2>
             <table class="table">
-              {/* head */}
-              <thead>
-                <tr>
-                  <th>Titulo</th>
-                  <th>Salario</th>
-                  <th>Supervisionado por</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* row 1 */}
-                <tr>
-                  <td>Quality Control Specialist</td>
-                  <td>R$ 49.99</td>
-                  <td>Ana</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="overflow-x-auto">
-            <h2 class='font-bold pl-4 text-2xl'>Endereço</h2>
-            <table class="table">
-              {/* head */}
               <thead>
                 <tr>
                   <th>Rua</th>
                   <th>Bairro</th>
-                  <th>Numero</th>
+                  <th>Número</th>
                   <th>CEP</th>
                   <th>Cidade</th>
                   <th>UF</th>
                 </tr>
               </thead>
               <tbody>
-                {/* row 1 */}
                 <tr>
-                  <td>Rua Itapura</td>
-                  <td>Jardim São Jorge</td>
-                  <td>1746</td>
-                  <td>03312-000</td>
-                  <td>Jales</td>
-                  <td>SP</td>
+                  <td>
+                    <input
+                      type="text"
+                      name="address.street"
+                      value={form.address.street}
+                      onInput={handleChange}
+                      placeholder="Rua"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="address.neighborhood"
+                      value={form.address.neighborhood}
+                      onInput={handleChange}
+                      placeholder="Bairro"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="address.number"
+                      value={form.address.number}
+                      onInput={handleChange}
+                      placeholder="Número"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="address.zip_code"
+                      value={form.address.zip_code}
+                      onInput={handleChange}
+                      placeholder="00000-000"
+                      pattern="\d{5}-?\d{3}"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="address.city"
+                      value={form.address.city}
+                      onInput={handleChange}
+                      placeholder="Cidade"
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="address.uf"
+                      value={form.address.uf}
+                      onInput={handleChange}
+                      placeholder="UF"
+                      maxLength={2}
+                      class="input input-bordered w-full"
+                      required
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          {/* Botão de envio */}
-          <div class="flex justify-end gap-2">
-            <button type="submit" class="btn btn-primary">
-              Salvar
+          <h2 class="font-bold pl-8 text-2xl">Função</h2>
+          <div class="flex flex-col pl-8 pr-8 md:flex-row gap-4">
+            <div class="flex-1">
+              <label class="form-control w-full">
+                <span class="label-text">Título</span>
+                <input
+                  type="text"
+                  name="function.title"
+                  value={form.function.title}
+                  onInput={handleChange}
+                  class="input input-bordered w-full"
+                  required
+                />
+              </label>
+            </div>
+            <div class="flex-1">
+              <label class="form-control w-full">
+                <span class="label-text">Salário</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  name="function.salary"
+                  value={form.function.salary}
+                  onInput={handleChange}
+                  class="input input-bordered w-full"
+                  required
+                />
+              </label>
+            </div>
+          </div>
+
+          <div class="flex justify-end mt-6 gap-2">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              class="btn btn-error"
+            >
+              Cancelar
             </button>
-            <a href="/">
-              <button type="submit" class="btn btn-error">
-                Cancelar
-              </button>
-            </a>
           </div>
         </form>
       </div>
