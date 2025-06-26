@@ -3,7 +3,6 @@
 _Transforming Ideas into Seamless Digital Realities_
 
 ![last-commit](https://img.shields.io/github/last-commit/BraceroInSabot/AV2?style=flat&logo=git&logoColor=white&color=0080ff)
-![repo-top-language](https://img.shields.io/github/languages/top/BraceroInSabot/AV2?style=flat&color=0080ff)
 ![repo-language-count](https://img.shields.io/github/languages/count/BraceroInSabot/AV2?style=flat&color=0080ff)
 
 _Built with the tools and technologies:_
